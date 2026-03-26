@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصفحة الشخصية - مؤيد</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* --- الأساسيات وصندوق الاحتواء --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* لمنع شريط التمرير أثناء حركة الخلفية */
+            font-family: 'Cairo', sans-serif;
+            background-color: #1a1a1a; /* لون خلفية غامق ليزيد وضوح التأثير */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* حاوية الخلفية المتحركة */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* خلف المحتوى */
+        }
+
+        /* كارت التعريف (البطاقة البيضاء) */
+        .profile-card {
+            background: rgba(255, 255, 255, 0.95); /* خلفية بيضاء شفافة قليلاً */
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            z-index: 10; /* فوق الخلفية */
+            position: relative;
+            backdrop-filter: blur(5px); /* تأثير ضبابي للخلفية خلف الكارت */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px); /* حركة خفيفة عند الوقوف على الكارت */
+        }
+
+        /* --- تنسيق الصورة --- */
+        .profile-pic-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 25px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .profile-pic-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* لضمان ملء الصورة للدائرة دون تشويه */
+        }
+
+        /* --- تنسيق النصوص المشكولة والجميلة --- */
+        .status-text {
+            font-family: 'Amiri', serif; /* خط كلاسيكي أجمل للتشكيل */
+            font-size: 1.6rem;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 700;
+            line-height: 1.4;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .info-item i {
+            margin-left: 10px; /* مسافة أيقونة على اليمين للنص العربي */
+            color: #3498db;
+            font-size: 1.4rem;
+        }
+
+        .info-item strong {
+            font-weight: 700;
+            color: #555;
+            margin-left: 5px;
+        }
+
+        .info-item.name {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .info-item.phone a {
+            color: #333;
+            text-decoration: none;
+            direction: ltr; /* لعرض الرقم بشكل صحيح من اليسار لليمين */
+            unicode-bidi: embed;
+            font-family: sans-serif; /* خط بسيط للأرقام */
+            font-weight: bold;
+        }
+        
+        .info-item.phone a:hover {
+            color: #3498db;
+        }
+
+        /* زر اتصّال سريع */
+        .call-btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 30px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .call-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* استعلامات الوسائط للهواتف (للشاشات الصغيرة جداً) */
+        @media (max-width: 400px) {
+            .profile-card { padding: 25px; }
+            .profile-pic-container { width: 120px; height: 120px; }
+            .status-text { font-size: 1.3rem; }
+            .info-item { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="profile-card">
+        
+        <div class="profile-pic-container">
+            <img src="image_0.png" alt="صورة مؤيد الشخصية">
+        </div>
+
+        <div class="status-text">
+            شَابٌّ أَعْزَبٌ جَاهِزٌ لِلِارْتِبَاطِ .
+        </div>
+
+        <div class="info-content">
+            <div class="info-item name">
+                <i class="fas fa-user-circle"></i>
+                <strong>الاسم :</strong> مـؤيـد .
+            </div>
+            <div class="info-item phone">
+                <i class="fas fa-phone-alt"></i>
+                <strong>الرقم :</strong> 
+                <a href="tel:+218930990224">+218 93-0990224</a>
+            </div>
+        </div>
+
+        <a href="https://api.whatsapp.com/send/?phone=%2B218930990224&text&type=phone_number&app_absent=0" class="call-btn">
+            <i class="fas fa-headset" style="margin-left: 8px;"></i>تواصل معي
+        </a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+
+        // ضبط حجم الكانفاس لملء الشاشة
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // كائن لتخزين موقع الماوس
+        let mouse = {
+            x: null,
+            y: null,
+            radius: (canvas.height/80) * (canvas.width/80) // منطقة التأثير
+        }
+
+        // تحديث موقع الماوس عند الحركة
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        // دعم اللمس للهواتف
+        window.addEventListener('touchmove', function(event) {
+            if (event.touches.length > 0) {
+                mouse.x = event.touches[0].clientX;
+                mouse.y = event.touches[0].clientY;
+            }
+        });
+        
+        // إزالة تأثير الماوس عند الخروج
+        window.addEventListener('mouseout', function(){
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+        window.addEventListener('touchend', function(){
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+
+        // إنشاء كائن الجزيء (الجسيم)
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            // رسم الجزيء
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = '#3498db'; // لون الجزيئات (أزرق خفيف)
+                ctx.fill();
+            }
+            // تحديث موقع الجزيء وتفاعله مع الماوس
+            update() {
+                // التأكد من بقاء الجزيء داخل الشاشة
+                if (this.x > canvas.width || this.x < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
+
+                // كشف التصادم مع الماوس (التفاعل)
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                if (distance < mouse.radius + this.size){
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
+                        this.x += 10;
+                    }
+                    if (mouse.x > this.x && this.x > this.size * 10) {
+                        this.x -= 10;
+                    }
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
+                        this.y += 10;
+                    }
+                    if (mouse.y > this.y && this.y > this.size * 10) {
+                        this.y -= 10;
+                    }
+                }
+                // حركة عادية
+                this.x += this.directionX;
+                this.y += this.directionY;
+                // رسم الجزيء المعدل
+                this.draw();
+            }
+        }
+
+        // إنشاء مصفوفة الجزيئات
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000; // كثافة الجزيئات
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1; // حجم عشوائي صغير جداً
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 2) - 1; // سرعة عشوائية
+                let directionY = (Math.random() * 2) - 1;
+                let color = '#3498db'; // نفس لون الرسم
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        // حلقة التحريك الرئيسية
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0,0,innerWidth, innerHeight); // مسح الإطار السابق
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connect(); // رسم الخطوط بين الجزيئات
+        }
+
+        // رسم خطوط بين الجزيئات القريبة من بعضها لعمل تأثير الشبكة
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = (( particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    if (distance < (canvas.width/7) * (canvas.height/7)) {
+                        opacityValue = 1 - (distance/20000);
+                        ctx.strokeStyle='rgba(52, 152, 219,' + opacityValue + ')'; // شفافية متغيرة للخطوط
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // إعادة ضبط الحجم عند تغيير حجم النافذة
+        window.addEventListener('resize', function(){
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            mouse.radius = ((canvas.height/80) * (canvas.width/80));
+            init();
+        });
+
+        // تشغيل البداية
+        init();
+        animate();
+    </script>
+</body>
+</html>
